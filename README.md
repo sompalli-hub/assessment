@@ -10,17 +10,24 @@ Steps to clone the Repository
 
 3.git clone git@github.com:sompalli-hub/assessment.git
 
-4.cd assessment
+4.cd assessment/src
 
 5.go get . <=== To get all dependencies
 
-6.Make build <=== To get the app binary
+6. cd ../build
+
+6.Make build <=== To get the app binary, stored in assessment/bin/
+
+
+Assumptions that are set to get to the above code
+================================================
+1. 
 
 
 Test the changes Locally
 ========================
 
-1.Execute the Binary ( ./assessment)
+1.cd assessment/bin/ , Execute the Binary ( ./assessment)
 
 It will host the sever on localhost:8080 port.
 
@@ -40,8 +47,14 @@ To Build the docker image
 
 The dockerfile is already present in the directory. docker image name can be tagged as per your choice. Here's the Example:
 
-1.sudo docker build -t assessment_image . <=== To get the docker Image
+1. Be in the root directory: cd assessment( where the Dockerfile is present)
 
+2.sudo docker build -t assessment_image . <=== To get the docker Image
+
+To Run the Docker image
+========================
+
+1.sudo docker ps to check if there are any containers running
 2.sudo docker run -p 8080:8080 assessment_image <== To run the docker image 
 
 Once the docker image is run, the same curl commands that's simulated above can be used to hit the container port with http traffic.
