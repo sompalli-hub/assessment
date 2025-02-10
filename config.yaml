@@ -1,5 +1,0 @@
----
-#config used by the application
-server_addr: "0.0.0.0"
-server_port: "8080"
-git_maxretries: 2 
