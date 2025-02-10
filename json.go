@@ -101,7 +101,6 @@ func handleScan(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Repository file contents fetched and store locally")
 }
 
-
 // Handle the POST /query endpoint to filter scan results
 func handleQuery(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -109,14 +108,12 @@ func handleQuery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Read the request body
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Error reading request body", http.StatusInternalServerError)
 		return
 	}
 
-	// Parse the filter request
 	var query pc.PostQuery
 	if err := json.Unmarshal(body, &query); err != nil {
 		http.Error(w, "Error unmarshaling filter request", http.StatusInternalServerError)

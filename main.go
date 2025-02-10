@@ -9,7 +9,7 @@ import (
 	pc "github.com/sompalli-hub/assessment/payloadcontent"
 )
 
-// **Function to Read YAML Config**
+//Read config file:(Its in the same path)
 func ReadConfig(filename string) (*pc.Config, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
@@ -27,8 +27,8 @@ func ReadConfig(filename string) (*pc.Config, error) {
 
 
 func main() {
-	//Read config file
 	var err error
+	//Read config file
 	Appconfig, err = ReadConfig("config.yaml")
 	if err != nil {
 		fmt.Println("Error loading config:", err)
