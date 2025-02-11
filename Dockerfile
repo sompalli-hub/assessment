@@ -10,7 +10,7 @@ COPY . .
 #Move to src directory to get/download the packages
 WORKDIR /test/src
 
-RUN go get .
+RUN go mod tidy & go get .
 
 #Move to build directory to run the Makefile
 WORKDIR /test/build

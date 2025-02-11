@@ -16,11 +16,19 @@ var severitymap map[string][]pc.Vulnerability
 var totalScans []pc.ScanArray
 var mu sync.RWMutex // Mutex for concurrency
 
-// Function to fetch and parse a JSON file from GitHub
+/*
+Description: Function to get Jsonfiles from github
+Functionality:
+	1.Create the github link in raw format
+	2.Attempt accessing the github for a maximum of GitMaxRetries
+	3.If the connection is successful, read the content and Unmarshal the payload
+	4.store the unmarshalled payload to a global store
+Returns: Nothing
+*/
 func fetchJSONFromGitHub(githubRepo, filePath string, wg *sync.WaitGroup) {
         defer wg.Done() 
         rawURL := fmt.Sprintf("https://raw.githubusercontent.com/%s/refs/heads/main/%s",githubRepo, filePath)
-	fmt.Printf("Accessing File :%s \n", filePath)
+	fmt.Printf("Accessing File :%s in URL :%s \n", filePath, rawURL)
 
 	for attempts := 1; attempts <= Appconfig.GitMaxRetries; attempts++ {
 	        resp, err := http.Get(rawURL)
@@ -60,7 +68,17 @@ func fetchJSONFromGitHub(githubRepo, filePath string, wg *sync.WaitGroup) {
 	}
 }
 
-// Handle the POST /scan endpoint to fetch JSON from GitHub and process it
+/*
+Description: Function to handle scan endpoint
+Functionality:
+	1.Basic error condition checks
+	2.Read the content insde http request and unmarshal the data
+	3.Process Files concurrently with go threads and wait groups if there are many files
+	4.Each go thread does a different file from github and store it in a common global map
+	5.Go through the global map and store the needed information that can be used during query API
+	6.Send the Response to the post message	
+Returns: Nothing
+*/
 func handleScan(w http.ResponseWriter, r *http.Request) {
 	// Ensure the request method is POST
 	if r.Method != http.MethodPost {
@@ -98,10 +116,19 @@ func handleScan(w http.ResponseWriter, r *http.Request) {
 	mu.Unlock()
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Repository file contents fetched and store locally")
+	//fmt.Fprintf(w, "Repository file contents fetched and store locally")
 }
 
-// Handle the POST /query endpoint to filter scan results
+/*
+Description: Function to handle query endpoint
+Functionality:
+	1.Basic error condition checks
+	2.Read the content insde http request and unmarshal the data
+	3.check the severity filter from the http request and match all the 
+	  vulnerabilities of that severity
+	6.Send the Response to the post message	
+Returns: Nothing
+*/
 func handleQuery(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)

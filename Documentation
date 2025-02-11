@@ -1,0 +1,65 @@
+What is Delivered:
+-----------------
+
+1.An application(named assessment) with two end points /scan and /query to handle the API requests posted to specific server
+2.The application expects the username/repo in scan requests along with the files that needs to be scanned in the repository
+3.The application scans the files concurrently using go threads to save the key-value pairs/content to local cache
+4.The application retries reaching github for configurable retries incase of access issues
+5.The application expects a config.yaml for the configurable values 
+6.The appplication responds to the query requests with the vulnerability list that matches the filter provided in the request
+7.The application can also be dockerized to a container service. 
+	( Steps to build the binary/build docker image/Launch the image is provided at https://github.com/sompalli-hub/assessment/blob/main/README.md)
+
+Assumptions:
+-----------
+1.As it is a single container service, database is not included in the design as part of container, but the database hook can be added/extended to the code
+  with Go interface implemenation. So, that the code for hook-up remains same, even if the database package differs ( ex : Mongo/Redis etc..)
+2.Server is launched on localhost using yamlfile on AWS EC2 instance, I haven't tried launching server on a different ip address.
+3.scan and query requests will be in the format mentioned in README.md including username/repo  
+4.As the assessment is concentrating on "Severity" key, i copied the vulnerabilities per Severity to a seperate map to access it during query request. Incase, if
+  there are any filters tomorrow, the whole payload can be saved to query based on any filter.
+4.Errors are not propogated to the user if the filenames are not present in the repository, Errors will be generated in logs. 
+	Incase if the appropriate err response needs to be propogated, it can be extended.
+
+
+
+Testcases
+---------
+1.User does mistake in config file.
+	Config file has some errors. Wrong configfile( some mistakes in configfile) 
+        Response: App doesnt start, it will throw error. Error loading config: yaml:
+
+2.Config file Not present
+         Response: App doesn't start, Error loading config: open : no such file or directory
+
+3.Configfile has permssion issues
+        Response: App doesn't start, Error loading config: open ../env/config.yaml: permission denied
+
+4. Open sever on an ip address which is unknown
+        Response: App doesn't start, Error :listen tcp 192.168.27.24:8080: bind: cannot assign requested address
+
+5. User sends a json file that doesn't exist in the repository path:
+        curl -X POST -H "Content-Type: application/json" -d '{ "repo": "velancio/vulnerability_scans", "files": ["vulnscan1011.json", "full.json"] }' http://localhost:8080/scan
+        2025/02/11 02:23:47 Failed to fetch file full.json: Status 404
+
+6. User doesn't mistake in simulating the CURL command 
+	 Errors in Posting to scan endpoint: ( used curl command)
+       		1. No URL specified in URL < == curl: (2) no URL specified
+       	 	2. No endpoint specified < == 404 page not found
+        	3. Wrong Port <=== Couldn't connect to server
+        	4. unknown Host <=== Could not resolve host
+
+7. If the user doesn't provide username/repo in scan request, the app can't access the github link
+	If the username/repo name is wrong, Files will not be fetched and erros are shown in logs, but there is no error sent in response. Incase if user needs to be informed, it can be extended to send the error response
+
+8.If the Json files uploaded to repository has formatting issues.
+	Json file format wrong in repository
+
+9.As the db is not present as a container service, Accessing query endpoint with out scanning the repository even once will not give any results
+	user can shutdown the app and launch it again with the query request as the first post.
+
+10.when github is not accessible, Verify if the connection is not tried more than configurable value
+
+11.Verify any new endpoint other than scan/query is not handled.
+
+12.Verify the filter that's provided in the query API is a valid filter, otherwise it shall return nothing

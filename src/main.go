@@ -9,7 +9,12 @@ import (
 	pc "github.com/sompalli-hub/assessment/payloadcontent"
 )
 
-//Read config file:(Its in the same path)
+/*
+description: Read the config file from internal path 
+Functionality:
+	1.Read the file and unmarshal the config parameters
+Return: Nothing
+*/
 func ReadConfig(filename string) (*pc.Config, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
@@ -25,7 +30,13 @@ func ReadConfig(filename string) (*pc.Config, error) {
 	return &config, nil
 }
 
-
+/*
+description: Start point of the application
+Functionality:
+	1.Read the config file and save the values locally
+	2.Start the server on configured port and listen on scan and query endpoints
+Return: Nothing
+*/
 func main() {
 	var err error
 	//Read config file
