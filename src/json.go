@@ -12,7 +12,7 @@ import (
 )
 
 var Appconfig *pc.Config
-var severitymap map[string][]pc.Vulnerability
+var severitymap map[string]map[string][]pc.Vulnerability
 var totalScans []pc.ScanArray
 var mu sync.RWMutex // Mutex for concurrency
 
@@ -109,8 +109,14 @@ func handleScan(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
         for _, scan := range totalScans {
 		for _, vul := range scan.KeyScanResult.Vulnerabilities {
-                        //fmt.Printf("Severity: %s \n",vul.Severity)
-                        severitymap[vul.Severity] = append(severitymap[vul.Severity], vul)
+			if _,ok := severitymap[vul.Severity]; !ok {
+				severitymap[vul.Severity] = make(map[string][]pc.Vulnerability)
+			}
+			/* I am assuming ID changes if there's content change in vulnerability
+			If ID remain same, it has not changed to what is already cached */
+			if _, exists := severitymap[vul.Severity][vul.ID]; !exists {
+                       		 severitymap[vul.Severity][vul.ID] = append(severitymap[vul.Severity][vul.ID], vul)
+			}
                 }
         }
 	mu.Unlock()
@@ -153,7 +159,9 @@ func handleQuery(w http.ResponseWriter, r *http.Request) {
 	mu.RLock()
 	for sev,result := range severitymap {
 		if sev == severity {
-			sevResults = result
+			for _,value := range result {
+				sevResults = append(sevResults, value...)
+			}
 		}
 	}
 	mu.RUnlock()

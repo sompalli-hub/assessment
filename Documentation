@@ -63,3 +63,17 @@ Testcases
 11.Verify any new endpoint other than scan/query is not handled.
 
 12.Verify the filter that's provided in the query API is a valid filter, otherwise it shall return nothing
+
+13.Parallely run many requests to the scan endpoint to determine if the application handles the scan requests
+
+Performance
+===========
+1. when the application is running, Issue the same command of scan request with the same file name 10 times and check the query request gives the result
+   of the matching filter only once and not 10 times
+
+2. Keep running the scan requests in while loop every 0.5 seconds from 5 terminals and check the CPU using "top" command to see that the CPU
+   doesn't keep growing. Transitional percentage variation is fine, but not a gradual increase. It indicates some issue
+
+3.Repeat the same testcase2, but check for memory. Memory percentage shouldn't be growing too large, but there can be chances that because of multiple go threads
+  running concurrently, there is a chance of false positives showing up or test on a system with higher RAM, if the same continues, there seems to be memory issue
+  in the application

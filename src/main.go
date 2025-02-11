@@ -47,7 +47,7 @@ func main() {
 	}
 	//fmt.Println("value of config are", Appconfig.ServerAddr, Appconfig.ServerPort, Appconfig.GitMaxRetries)
 	//Start a https server and expose two end points
-	severitymap = make(map[string][]pc.Vulnerability)	
+	severitymap = make(map[string]map[string][]pc.Vulnerability)	
 	http.HandleFunc("/scan", handleScan)
 	http.HandleFunc("/query", handleQuery)
 
