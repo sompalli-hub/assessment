@@ -1,6 +1,9 @@
 # assessment
 Project assessment
 
+What is being delivered, Assumptions and testcases are mentioned in assessment/documentation. 
+This file provides how to clone,execute and launch the service 
+
 Steps to clone the Repository
 =============================
 
@@ -17,12 +20,6 @@ Steps to clone the Repository
 6. cd ../build
 
 6.Make build <=== To get the app binary, stored in assessment/bin/
-
-
-Assumptions that are set to get to the above code
-================================================
-1. 
-
 
 Test the changes Locally
 ========================
